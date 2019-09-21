@@ -1,0 +1,3 @@
+[submodule "filebot"]
+	path = filebot
+	url = https://github.com/filebot/filebot-docker.git
