@@ -1,0 +1,41 @@
+version: '3'
+services:
+  app:
+    image: jdownloader2-headless
+    build:
+      context: ./headless-jd2-docker/
+      dockerfile: alpine.Dockerfile
+    restart: always
+    volumes:
+      - "$DOCKER_DATA/jdownloader/config/:/opt/JDownloader/cfg:rw"
+      - "$JDOWNLOADER_DOWNLOAD_DIRECTORY/input:/opt/JDownloader/Downloads:rw"
+    env_file:
+      jdownloader.env
+  filebot:
+    build:
+      context: ./filebot/
+      dockerfile: Dockerfile
+    restart: always
+    user: "${UID}:${GID}"
+    environment:
+      - INPUT_DIR=/volume1/input
+      - OUTPUT_DIR=/volume1/output
+#      - ACTION=test
+#      - ACTION=duplicate
+      - ACTION=move
+    volumes:
+      - ./run-filebot.sh:/opt/run-filebot.sh
+      - $DOCKER_DATA/filebot/data:/data:rw
+      - ./filebot-license.psm:/volume1/license.psm
+      - $JDOWNLOADER_DOWNLOAD_DIRECTORY/input:/volume1/input:rw
+      - $JDOWNLOADER_DOWNLOAD_DIRECTORY/done:/volume1/output:rw
+    entrypoint: |
+      bash -c 'bash -s <<EOF
+      trap "break;exit" SIGHUP SIGINT SIGTERM
+      while /bin/true; do
+        echo "running filebot..."
+        /opt/run-filebot.sh
+        echo "filebot run finished"
+      sleep 3600
+      done
+      EOF'
