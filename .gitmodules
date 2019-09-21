@@ -1,3 +1,6 @@
 [submodule "filebot"]
 	path = filebot
 	url = https://github.com/filebot/filebot-docker.git
+[submodule "headless-jd2-docker"]
+	path = headless-jd2-docker
+	url = https://github.com/PlusMinus0/headless-jd2-docker.git
